@@ -499,5 +499,16 @@ window.addEventListener("scroll", () => {
   });
 });
 
+window.addEventListener('storage', (e) => {
+  if (e.key === 'confessions' || e.key === 'bannedKeywords') {
+    confessions = JSON.parse(localStorage.getItem("confessions")) || [];
+    bannedKeywords = JSON.parse(localStorage.getItem("bannedKeywords")) || ["spam", "abuse", "hate"];
+    renderFeed();
+  }
+});
+
+// Refresh "time ago" every minute
+setInterval(renderFeed, 60000);
+
 init();
 
