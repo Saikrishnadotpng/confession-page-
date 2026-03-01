@@ -279,8 +279,8 @@ async function handleSubmit(e) {
     }
   }
 
-  if (text.length < 5) {
-    showError("Confession must be at least 5 characters.");
+  if (text.length < 1) {
+    showError("Confession cannot be empty.");
     return;
   }
 
