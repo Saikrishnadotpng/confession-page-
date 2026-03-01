@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>2AM Confession Feed</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#7f0df2",
+                        "background-light": "#f7f5f8",
+                        "background-dark": "#0f0f0f",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(127, 13, 242, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(127, 13, 242, 0.15);
+        }
+        .bg-mesh {
+            background-color: #0f0f0f;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(127, 13, 242, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(127, 13, 242, 0.1) 0px, transparent 50%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex flex-col items-center">
+<div class="relative flex min-h-screen w-full max-w-[430px] flex-col bg-mesh overflow-x-hidden shadow-2xl border-x border-primary/10">
+<header class="sticky top-0 z-50 flex items-center bg-background-dark/80 backdrop-blur-lg p-4 justify-between border-b border-primary/20">
+<div class="flex size-10 shrink-0 items-center justify-center text-primary">
+<span class="material-symbols-outlined text-2xl">nights_stay</span>
+</div>
+<h1 class="text-slate-100 text-xl font-bold tracking-tight flex-1 text-center">2AM Confessions</h1>
+<div class="flex w-10 items-center justify-end">
+<button class="flex size-10 cursor-pointer items-center justify-center rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</header>
+<nav class="flex border-b border-primary/10 px-4 gap-8 bg-background-dark/40">
+<a class="flex flex-col items-center justify-center border-b-2 border-primary text-primary pb-3 pt-4 px-2" href="#">
+<p class="text-sm font-bold">Trending</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-2 border-transparent text-slate-400 pb-3 pt-4 px-2 hover:text-slate-200" href="#">
+<p class="text-sm font-bold">Recent</p>
+</a>
+<a class="flex flex-col items-center justify-center border-b-2 border-transparent text-slate-400 pb-3 pt-4 px-2 hover:text-slate-200" href="#">
+<p class="text-sm font-bold">Secrets</p>
+</a>
+</nav>
+<main class="flex-1 p-4 space-y-6 overflow-y-auto pb-32">
+<div class="glass-card p-5 rounded-xl shadow-lg relative overflow-hidden group">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-primary text-lg">auto_awesome</span>
+<span class="text-primary/80 text-xs font-medium uppercase tracking-widest">pensive</span>
+</div>
+<p class="text-slate-100 text-lg font-medium leading-relaxed mb-6">
+                    Sometimes I walk through the park at night just to feel small under the giant trees. It's the only time I feel like I'm exactly where I should be.
+                </p>
+<div class="flex items-center justify-between border-t border-primary/10 pt-4">
+<p class="text-slate-500 text-xs font-medium">2 hours ago</p>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-1.5 text-slate-400 hover:text-red-400 transition-colors">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+<span class="text-[12px] font-bold">124</span>
+</button>
+<button class="flex items-center gap-1.5 text-slate-400 hover:text-yellow-400 transition-colors">
+<span class="material-symbols-outlined text-[20px]">sentiment_very_satisfied</span>
+<span class="text-[12px] font-bold">12</span>
+</button>
+<button class="flex items-center gap-1.5 text-slate-400 hover:text-blue-400 transition-colors">
+<span class="material-symbols-outlined text-[20px]">sentiment_dissatisfied</span>
+<span class="text-[12px] font-bold">45</span>
+</button>
+<button class="flex items-center gap-1.5 text-slate-400 hover:text-orange-400 transition-colors">
+<span class="material-symbols-outlined text-[20px]">local_fire_department</span>
+<span class="text-[12px] font-bold">89</span>
+</button>
+</div>
+</div>
+</div>
+<div class="glass-card p-5 rounded-xl shadow-lg relative overflow-hidden">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-primary text-lg">cloud</span>
+<span class="text-primary/80 text-xs font-medium uppercase tracking-widest">dreamy</span>
+</div>
+<p class="text-slate-100 text-lg font-medium leading-relaxed mb-6">
+                    I still remember the smell of the rain in that small café in Paris. I never told her I stayed an extra week just to see if I'd run into her again.
+                </p>
+<div class="flex items-center justify-between border-t border-primary/10 pt-4">
+<p class="text-slate-500 text-xs font-medium">4 hours ago</p>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-1.5 text-slate-400 hover:text-red-400">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+<span class="text-[12px] font-bold">342</span>
+</button>
+<button class="flex items-center gap-1.5 text-slate-400">
+<span class="material-symbols-outlined text-[20px]">local_fire_department</span>
+<span class="text-[12px] font-bold">211</span>
+</button>
+</div>
+</div>
+</div>
+<div class="glass-card p-5 rounded-xl shadow-lg relative overflow-hidden border-l-4 border-primary">
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-primary text-lg">visibility_off</span>
+<span class="text-primary/80 text-xs font-medium uppercase tracking-widest">top secret</span>
+</div>
+<p class="text-slate-100 text-lg font-medium leading-relaxed mb-6">
+                    I pretend to hate the office parties, but I secretly spend hours choosing my outfit hoping he'll notice me. He never does.
+                </p>
+<div class="flex items-center justify-between border-t border-primary/10 pt-4">
+<p class="text-slate-500 text-xs font-medium">5 hours ago</p>
+<div class="flex items-center gap-4">
+<button class="flex items-center gap-1.5 text-slate-400">
+<span class="material-symbols-outlined text-[20px]">favorite</span>
+<span class="text-[12px] font-bold">1.2k</span>
+</button>
+<button class="flex items-center gap-1.5 text-slate-400">
+<span class="material-symbols-outlined text-[20px]">sentiment_dissatisfied</span>
+<span class="text-[12px] font-bold">18</span>
+</button>
+</div>
+</div>
+</div>
+</main>
+<button class="fixed bottom-24 right-6 size-14 flex items-center justify-center bg-primary rounded-full shadow-xl text-white hover:scale-105 transition-transform z-50">
+<span class="material-symbols-outlined text-3xl">casino</span>
+</button>
+<div class="fixed bottom-0 left-0 right-0 max-w-[430px] mx-auto z-50">
+<div class="flex gap-2 border-t border-primary/20 bg-background-dark/90 backdrop-blur-xl px-4 pb-8 pt-3">
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-primary" href="#">
+<span class="material-symbols-outlined text-[28px] fill-1">home</span>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[28px]">search</span>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1" href="#">
+<div class="size-12 bg-primary flex items-center justify-center rounded-full -mt-8 shadow-lg shadow-primary/40 text-white">
+<span class="material-symbols-outlined text-[32px]">add</span>
+</div>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[28px]">explore</span>
+</a>
+<a class="flex flex-1 flex-col items-center justify-center gap-1 text-slate-500 hover:text-primary transition-colors" href="#">
+<span class="material-symbols-outlined text-[28px]">person</span>
+</a>
+</div>
+</div>
+</div>
+</body></html>

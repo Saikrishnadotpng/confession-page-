@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>2AM – Say it. No one will know.</title>
+    <link rel="stylesheet" href="style.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body class="theme-late-night">
+    <div class="background-animation"></div>
+
+    <header class="hero">
+      <h1 class="hero-title">Say it. No one will know.</h1>
+      <p class="hero-subtitle">
+        A safe anonymous space for late-night confessions.
+      </p>
+      <button class="cta-button" onclick="scrollToForm()">
+        Write a Confession
+      </button>
+    </header>
+
+    <main class="container">
+      <section id="submission-section" class="glass-card submission-card">
+        <form id="confession-form">
+          <div id="step-1" class="step-container">
+            <h3 class="step-title">Before you whisper...</h3>
+            <div class="user-details-group">
+              <input type="number" id="user-age" placeholder="Age" min="1" max="120" required class="glass-input" />
+              <input type="email" id="user-email" placeholder="Your Email (required for under 18)" class="glass-input hidden" />
+            </div>
+            <button type="button" id="verify-age-btn" class="submit-button verify-btn">Unlock Confession</button>
+          </div>
+
+          <div id="step-2" class="step-container hidden">
+            <textarea
+              id="confession-text"
+              placeholder="Whisper your secret..."
+              maxlength="80000"
+            ></textarea>
+            <div class="form-footer">
+              <span class="char-counter"><span id="char-count">0</span>/80000</span>
+              <select id="mood-selector" class="mood-select">
+                <option value="🌙" selected>🌙 Late Night Thoughts</option>
+                <option value="💖">💖 Crush</option>
+                <option value="😂">😂 Funny</option>
+                <option value="😢">😢 Regret</option>
+                <option value="🔥">🔥 Spicy</option>
+                <option value="🌧">🌧 Vent</option>
+              </select>
+            </div>
+            <div id="error-message" class="error-text"></div>
+            <button type="submit" class="submit-button">
+              Send into the night
+            </button>
+          </div>
+        </form>
+        <div id="confirmation-message" class="hidden typewriter-text"></div>
+      </section>
+
+      <section id="featured-section" class="featured-container hidden">
+        <!-- Confession of the night goes here -->
+      </section>
+
+      <section id="feed-section" class="feed-container">
+        <!-- Confessions go here -->
+      </section>
+    </main>
+
+    <button
+      id="random-button"
+      class="floating-btn"
+      onclick="scrollToRandom()"
+      title="Show me something random"
+    >
+      🎲
+    </button>
+
+    <script src="script.js"></script>
+  </body>
+</html>

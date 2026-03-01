@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2AM Admin Dashboard</title>
+    <style>
+        body {
+            background-color: #0f0f0f;
+            color: #e0e0e0;
+            font-family: 'Inter', sans-serif;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        h1 { margin-bottom: 2rem; border-bottom: 1px solid #333; padding-bottom: 1rem; }
+        .login-box {
+            background: #1a1a24;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 400px;
+            margin: 100px auto;
+            text-align: center;
+            border: 1px solid #333;
+        }
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            background: #000;
+            border: 1px solid #333;
+            color: white;
+            border-radius: 4px;
+        }
+        button {
+            padding: 0.5rem 1rem;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover { background: #555; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+        }
+        th, td {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid #333;
+        }
+        th { background: #1a1a24; }
+        .actions { display: flex; gap: 0.5rem; }
+        .hidden { display: none !important; }
+        .banned-words { margin-top: 2rem; background: #1a1a24; padding: 1rem; border-radius: 8px; }
+        .badge { padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; }
+        .badge.pending { background: #b8860b; }
+        .badge.approved { background: #006400; }
+        .badge.rejected { background: #8b0000; }
+        .badge.featured { background: #4b0082; }
+    </style>
+    </style>
+</head>
+<body>
+
+    <div id="login-screen" class="login-box">
+        <h2>Admin Access</h2>
+        <input type="password" id="admin-pass" placeholder="Enter password (hint: 2am)">
+        <button onclick="login()">Enter</button>
+        <div id="login-error" style="color: red; margin-top: 1rem;"></div>
+    </div>
+
+    <div id="dashboard" class="container hidden">
+        <h1>Admin Dashboard</h1>
+        
+        <div style="margin-bottom: 2rem;">
+            <button onclick="logout()">Logout</button>
+            <a href="index.html" style="color: #a0a0a0; margin-left: 1rem;">Back to site</a>
+        </div>
+
+        <div class="banned-words">
+            <h3>Banned Keywords</h3>
+            <div id="keywords-list" style="margin-bottom: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;"></div>
+            <input type="text" id="new-keyword" placeholder="Add new banned word" style="width: auto; display: inline-block;">
+            <button onclick="addKeyword()">Add</button>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Confession</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="admin-table-body">
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        let confessions = JSON.parse(localStorage.getItem('confessions')) || [];
+        let bannedKeywords = JSON.parse(localStorage.getItem('bannedKeywords')) || ['spam', 'abuse', 'hate'];
+
+        window.login = function() {
+            const pass = document.getElementById('admin-pass').value;
+            if (pass === '2am') {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                renderAdmin();
+                renderKeywords();
+            } else {
+                document.getElementById('login-error').textContent = 'Incorrect password';
+            }
+        };
+
+        window.logout = function() {
+            document.getElementById('dashboard').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('admin-pass').value = '';
+        };
+
+        function renderAdmin() {
+            const tbody = document.getElementById('admin-table-body');
+            tbody.innerHTML = confessions.map(c => `
+                <tr>
+                    <td style="white-space: nowrap; font-size: 0.8rem;">${new Date(c.timestamp).toLocaleString()}</td>
+                    <td style="max-width: 400px; word-wrap: break-word; line-height: 1.4;">${escapeHTML(c.text)}</td>
+                    <td>
+                        <span class="badge ${c.status}">${c.status}</span>
+                        ${c.featured ? '<br><span class="badge featured" style="margin-top:0.3rem;display:inline-block;">featured</span>' : ''}
+                    </td>
+                    <td class="actions">
+                        ${c.status !== 'approved' ? `<button onclick="updateStatus('${c.id}', 'approved')">Approve</button>` : ''}
+                        ${c.status !== 'rejected' && c.status === 'approved' ? `<button onclick="updateStatus('${c.id}', 'rejected')" style="background:#500;">Reject</button>` : ''}
+                        ${c.status === 'approved' ? `<button onclick="toggleFeature('${c.id}')">${c.featured ? 'Unfeature' : 'Feature'}</button>` : ''}
+                        <button onclick="deleteConfession('${c.id}')" style="background:#800;">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderKeywords() {
+            const list = document.getElementById('keywords-list');
+            list.innerHTML = bannedKeywords.map(w => `
+                <span style="background:#333; padding:0.3rem 0.6rem; border-radius:15px; font-size:0.9rem; display:flex; align-items:center; gap:0.5rem;">
+                    ${escapeHTML(w)}
+                    <button style="padding:0; background:none; color:#ff6b6b; border:none; cursor:pointer;" onclick="removeKeyword('${w.replace(/'/g, "\\'")}')">&times;</button>
+                </span>
+            `).join('');
+        }
+
+        window.addKeyword = function() {
+            const val = document.getElementById('new-keyword').value.trim().toLowerCase();
+            if (val && !bannedKeywords.includes(val)) {
+                bannedKeywords.push(val);
+                saveData();
+                renderKeywords();
+                document.getElementById('new-keyword').value = '';
+            }
+        };
+
+        window.removeKeyword = function(word) {
+            bannedKeywords = bannedKeywords.filter(w => w !== word);
+            saveData();
+            renderKeywords();
+        };
+
+        window.updateStatus = function(id, status) {
+            const c = confessions.find(x => x.id === id);
+            if (c) {
+                c.status = status;
+                if (status !== 'approved') c.featured = false;
+                saveData();
+                renderAdmin();
+            }
+        };
+
+        window.toggleFeature = function(id) {
+            const c = confessions.find(x => x.id === id);
+            if (c) {
+                if (!c.featured && c.status !== 'approved') c.status = 'approved';
+                if (!c.featured) {
+                    confessions.forEach(x => x.featured = false);
+                }
+                c.featured = !c.featured;
+                saveData();
+                renderAdmin();
+            }
+        };
+
+        window.deleteConfession = function(id) {
+            if (confirm('Are you sure you want to delete this confession?')) {
+                confessions = confessions.filter(x => x.id !== id);
+                saveData();
+                renderAdmin();
+            }
+        };
+
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag] || tag)
+            );
+        }
+
+        function saveData() {
+            localStorage.setItem('confessions', JSON.stringify(confessions));
+            localStorage.setItem('bannedKeywords', JSON.stringify(bannedKeywords));
+        }
+    </script>
+</body>
+</html>
