@@ -42,7 +42,7 @@ const themes = {
 
 async function loadConfessions() {
   try {
-    const res = await fetch(`${SUPA_URL}/confessions?select=*&order=timestamp.desc`, {
+    const res = await fetch(`${SUPA_URL}/confession?select=*&order=timestamp.desc`, {
       headers: {
         'apikey': SUPA_KEY,
         'Authorization': `Bearer ${SUPA_KEY}`
@@ -330,7 +330,7 @@ async function handleSubmit(e) {
     submitBtn.disabled = true;
     submitBtn.textContent = "Sending...";
     
-    const res = await fetch(`${SUPA_URL}/confessions`, {
+    const res = await fetch(`${SUPA_URL}/confession`, {
       method: "POST",
       headers: {
         "apikey": SUPA_KEY,
@@ -493,7 +493,7 @@ window.react = async function (id, type) {
     document.getElementById(`r-${type}-${id}`).textContent = confession.reactions[type];
     
     try {
-      await fetch(`${SUPA_URL}/confessions?id=eq.${id}`, {
+      await fetch(`${SUPA_URL}/confession?id=eq.${id}`, {
         method: "PATCH",
         headers: {
           "apikey": SUPA_KEY,

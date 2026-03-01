@@ -139,7 +139,7 @@
         
         async function loadData() {
             try {
-                const res = await fetch(`${SUPA_URL}/confessions?select=*&order=timestamp.desc`, {
+                const res = await fetch(`${SUPA_URL}/confession?select=*&order=timestamp.desc`, {
                     headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}` }
                 });
                 if (res.ok) {
@@ -237,7 +237,7 @@
                 renderAdmin();
 
                 try {
-                    await fetch(`${SUPA_URL}/confessions?id=eq.${id}`, {
+                    await fetch(`${SUPA_URL}/confession?id=eq.${id}`, {
                         method: "PATCH",
                         headers: { "apikey": SUPA_KEY, "Authorization": `Bearer ${SUPA_KEY}`, "Content-Type": "application/json" },
                         body: JSON.stringify({ status: newStatus, featured: newFeatured })
@@ -260,7 +260,7 @@
                         if (x.featured && x.id !== id) {
                             x.featured = false;
                             patches.push(
-                                fetch(`${SUPA_URL}/confessions?id=eq.${x.id}`, {
+                                fetch(`${SUPA_URL}/confession?id=eq.${x.id}`, {
                                     method: "PATCH",
                                     headers: { "apikey": SUPA_KEY, "Authorization": `Bearer ${SUPA_KEY}`, "Content-Type": "application/json" },
                                     body: JSON.stringify({ featured: false })
@@ -274,7 +274,7 @@
                 renderAdmin();
                 
                 patches.push(
-                    fetch(`${SUPA_URL}/confessions?id=eq.${id}`, {
+                    fetch(`${SUPA_URL}/confession?id=eq.${id}`, {
                         method: "PATCH",
                         headers: { "apikey": SUPA_KEY, "Authorization": `Bearer ${SUPA_KEY}`, "Content-Type": "application/json" },
                         body: JSON.stringify({ status: c.status, featured: c.featured })
@@ -291,7 +291,7 @@
                 renderAdmin();
                 
                 try {
-                    await fetch(`${SUPA_URL}/confessions?id=eq.${id}`, {
+                    await fetch(`${SUPA_URL}/confession?id=eq.${id}`, {
                         method: "DELETE",
                         headers: { "apikey": SUPA_KEY, "Authorization": `Bearer ${SUPA_KEY}` }
                     });
