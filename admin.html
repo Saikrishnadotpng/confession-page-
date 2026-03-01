@@ -81,7 +81,10 @@
     </div>
 
     <script>
-        let confessions = JSON.parse(localStorage.getItem('confessions')) || [];
+        const SUPA_URL = 'https://fwjfquiklvcveflqdken.supabase.co/rest/v1';
+        const SUPA_KEY = 'sb_publishable_Ox2fe4PkcBGqevWX91vqeA_Xxsc8O2V';
+        
+        let confessions = [];
         let bannedKeywords = JSON.parse(localStorage.getItem('bannedKeywords')) || ['spam', 'abuse', 'hate'];
         let refreshInterval;
 
@@ -115,27 +118,37 @@
         
         function initDashboard() {
             loadData();
-            renderAdmin();
             renderKeywords();
             
             // Auto Update Support
             window.addEventListener('storage', syncData);
             
+            // Auto refresh from database every 10 seconds
+            refreshInterval = setInterval(loadData, 10000);
+            
             // Refresh "time ago" every minute
-            refreshInterval = setInterval(renderAdmin, 60000);
+            setInterval(renderAdmin, 60000);
         }
         
         function syncData(e) {
-            if (e.key === 'confessions' || e.key === 'bannedKeywords') {
-                loadData();
-                renderAdmin();
+            if (e.key === 'bannedKeywords') {
+                bannedKeywords = JSON.parse(localStorage.getItem('bannedKeywords')) || ['spam', 'abuse', 'hate'];
                 renderKeywords();
             }
         }
         
-        function loadData() {
-            confessions = JSON.parse(localStorage.getItem('confessions')) || [];
-            bannedKeywords = JSON.parse(localStorage.getItem('bannedKeywords')) || ['spam', 'abuse', 'hate'];
+        async function loadData() {
+            try {
+                const res = await fetch(`${SUPA_URL}/confessions?select=*&order=timestamp.desc`, {
+                    headers: { 'apikey': SUPA_KEY, 'Authorization': `Bearer ${SUPA_KEY}` }
+                });
+                if (res.ok) {
+                    confessions = await res.json();
+                    renderAdmin();
+                }
+            } catch(e) {
+                console.error("Failed to fetch confessions", e);
+            }
         }
 
         function renderAdmin() {
@@ -213,34 +226,76 @@
             renderKeywords();
         };
 
-        window.updateStatus = function(id, status) {
+        window.updateStatus = async function(id, status) {
             const c = confessions.find(x => x.id === id);
             if (c) {
-                c.status = status;
-                if (status !== 'approved') c.featured = false;
-                saveData();
+                const newStatus = status;
+                const newFeatured = status !== 'approved' ? false : c.featured;
+                
+                c.status = newStatus;
+                c.featured = newFeatured;
                 renderAdmin();
+
+                try {
+                    await fetch(`${SUPA_URL}/confessions?id=eq.${id}`, {
+                        method: "PATCH",
+                        headers: { "apikey": SUPA_KEY, "Authorization": `Bearer ${SUPA_KEY}`, "Content-Type": "application/json" },
+                        body: JSON.stringify({ status: newStatus, featured: newFeatured })
+                    });
+                } catch(e) { console.error(e); }
             }
         };
 
-        window.toggleFeature = function(id) {
+        window.toggleFeature = async function(id) {
             const c = confessions.find(x => x.id === id);
             if (c) {
-                if (!c.featured && c.status !== 'approved') c.status = 'approved';
-                if (!c.featured) {
-                    confessions.forEach(x => x.featured = false);
+                if (!c.featured && c.status !== 'approved') {
+                    c.status = 'approved';
                 }
+                
+                let patches = [];
+                // If we are featuring this, unfeature everything else locally and remotely
+                if (!c.featured) {
+                    confessions.forEach(x => {
+                        if (x.featured && x.id !== id) {
+                            x.featured = false;
+                            patches.push(
+                                fetch(`${SUPA_URL}/confessions?id=eq.${x.id}`, {
+                                    method: "PATCH",
+                                    headers: { "apikey": SUPA_KEY, "Authorization": `Bearer ${SUPA_KEY}`, "Content-Type": "application/json" },
+                                    body: JSON.stringify({ featured: false })
+                                })
+                            );
+                        }
+                    });
+                }
+                
                 c.featured = !c.featured;
-                saveData();
                 renderAdmin();
+                
+                patches.push(
+                    fetch(`${SUPA_URL}/confessions?id=eq.${id}`, {
+                        method: "PATCH",
+                        headers: { "apikey": SUPA_KEY, "Authorization": `Bearer ${SUPA_KEY}`, "Content-Type": "application/json" },
+                        body: JSON.stringify({ status: c.status, featured: c.featured })
+                    })
+                );
+                
+                try { await Promise.all(patches); } catch(e) { console.error(e); }
             }
         };
 
-        window.deleteConfession = function(id) {
+        window.deleteConfession = async function(id) {
             if (confirm('Are you sure you want to delete this confession?')) {
                 confessions = confessions.filter(x => x.id !== id);
-                saveData();
                 renderAdmin();
+                
+                try {
+                    await fetch(`${SUPA_URL}/confessions?id=eq.${id}`, {
+                        method: "DELETE",
+                        headers: { "apikey": SUPA_KEY, "Authorization": `Bearer ${SUPA_KEY}` }
+                    });
+                } catch(e) { console.error(e); }
             }
         };
 
@@ -257,11 +312,7 @@
         }
 
         function saveData() {
-            localStorage.setItem('confessions', JSON.stringify(confessions));
             localStorage.setItem('bannedKeywords', JSON.stringify(bannedKeywords));
-            window.dispatchEvent(new StorageEvent('storage', {
-              key: 'confessions'
-            }));
         }
         
         function timeAgo(dateString) {

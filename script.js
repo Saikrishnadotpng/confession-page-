@@ -5,6 +5,9 @@ let bannedKeywords = JSON.parse(localStorage.getItem("bannedKeywords")) || [
   "hate",
 ];
 
+const SUPA_URL = 'https://fwjfquiklvcveflqdken.supabase.co/rest/v1';
+const SUPA_KEY = 'sb_publishable_Ox2fe4PkcBGqevWX91vqeA_Xxsc8O2V';
+
 const DOM = {
   form: document.getElementById("confession-form"),
   text: document.getElementById("confession-text"),
@@ -37,6 +40,23 @@ const themes = {
   "🌧": "theme-vent"
 };
 
+async function loadConfessions() {
+  try {
+    const res = await fetch(`${SUPA_URL}/confessions?select=*&order=timestamp.desc`, {
+      headers: {
+        'apikey': SUPA_KEY,
+        'Authorization': `Bearer ${SUPA_KEY}`
+      }
+    });
+    if (res.ok) {
+      confessions = await res.json();
+      renderFeed();
+    }
+  } catch(e) {
+    console.error("Failed to fetch confessions", e);
+  }
+}
+
 function init() {
   if (DOM.form) {
     DOM.text.addEventListener("input", handleInput);
@@ -48,7 +68,7 @@ function init() {
     document.addEventListener("click", initAudio, { once: true });
     
     if(DOM.verifyBtn) DOM.verifyBtn.addEventListener("click", handleVerify);
-    renderFeed();
+    loadConfessions();
     handleMoodChange(false); // init without animation
   }
 }
@@ -305,8 +325,33 @@ async function handleSubmit(e) {
     age: age
   };
 
-  confessions.unshift(newConfession);
-  saveData();
+  try {
+    const submitBtn = DOM.form.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Sending...";
+    
+    const res = await fetch(`${SUPA_URL}/confessions`, {
+      method: "POST",
+      headers: {
+        "apikey": SUPA_KEY,
+        "Authorization": `Bearer ${SUPA_KEY}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(newConfession)
+    });
+    
+    if (!res.ok) throw new Error("Failed to post confession");
+    
+    confessions.unshift(newConfession);
+    renderFeed();
+  } catch(e) {
+    console.error(e);
+    showError("Network error. Could not send confession.");
+    const submitBtn = DOM.form.querySelector('button[type="submit"]');
+    submitBtn.disabled = false;
+    submitBtn.textContent = "Send into the night";
+    return;
+  }
 
   DOM.form.classList.add("hidden");
   DOM.confirmation.classList.remove("hidden");
@@ -331,6 +376,10 @@ async function handleSubmit(e) {
         DOM.confirmation.classList.add("hidden");
         DOM.confirmation.innerHTML = "";
         DOM.form.classList.remove("hidden");
+        
+        const submitBtn = DOM.form.querySelector('button[type="submit"]');
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Send into the night";
         renderFeed();
       }, 4000);
     },
@@ -437,12 +486,25 @@ function createCardHTML(confession, isFeatured) {
 }
 
 // Make globally available for onclick
-window.react = function (id, type) {
+window.react = async function (id, type) {
   const confession = confessions.find((c) => c.id === id);
   if (confession) {
     confession.reactions[type]++;
-    saveData();
     document.getElementById(`r-${type}-${id}`).textContent = confession.reactions[type];
+    
+    try {
+      await fetch(`${SUPA_URL}/confessions?id=eq.${id}`, {
+        method: "PATCH",
+        headers: {
+          "apikey": SUPA_KEY,
+          "Authorization": `Bearer ${SUPA_KEY}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ reactions: confession.reactions })
+      });
+    } catch(e) {
+      console.error("Failed to post reaction", e);
+    }
   }
 };
 
@@ -500,12 +562,15 @@ window.addEventListener("scroll", () => {
 });
 
 window.addEventListener('storage', (e) => {
-  if (e.key === 'confessions' || e.key === 'bannedKeywords') {
-    confessions = JSON.parse(localStorage.getItem("confessions")) || [];
+  if (e.key === 'bannedKeywords') {
     bannedKeywords = JSON.parse(localStorage.getItem("bannedKeywords")) || ["spam", "abuse", "hate"];
-    renderFeed();
   }
 });
+
+// Refresh feed from database every 10 seconds
+setInterval(() => {
+  loadConfessions();
+}, 10000);
 
 // Refresh "time ago" every minute
 setInterval(renderFeed, 60000);
