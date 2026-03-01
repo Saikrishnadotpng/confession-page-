@@ -4,154 +4,188 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>2AM Admin Dashboard</title>
+    <link rel="stylesheet" href="style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Outfit:wght@400;700&display=swap" rel="stylesheet" />
     <style>
-        body {
-            background-color: #0f0f0f;
-            color: #e0e0e0;
-            font-family: 'Inter', sans-serif;
-            padding: 2rem;
+        .badge { padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; }
+        .badge.pending { background: #b8860b; color: #fff; }
+        .badge.approved { background: #006400; color: #fff;}
+        .badge.rejected { background: #8b0000; color: #fff; }
+        .badge.featured { background: #4b0082; color: #fff; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; color: var(--text-primary); }
+        th, td { text-align: left; padding: 1rem; border-bottom: 1px solid var(--glass-border); }
+        th { background: rgba(0,0,0,0.3); font-family: "Outfit", sans-serif; }
+        
+        .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .action-btn { 
+            padding: 0.4rem 0.8rem; border-radius: 4px; border: none; cursor: pointer; 
+            font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 600; transition: all 0.2s; 
         }
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-        }
-        h1 { margin-bottom: 2rem; border-bottom: 1px solid #333; padding-bottom: 1rem; }
-        .login-box {
-            background: #1a1a24;
-            padding: 2rem;
-            border-radius: 8px;
-            max-width: 400px;
-            margin: 100px auto;
-            text-align: center;
-            border: 1px solid #333;
-        }
-        input {
-            width: 100%;
-            padding: 0.8rem;
-            margin-bottom: 1rem;
-            background: #000;
-            border: 1px solid #333;
-            color: white;
-            border-radius: 4px;
-        }
-        button {
-            padding: 0.5rem 1rem;
-            background: #333;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-        button:hover { background: #555; }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 2rem;
-        }
-        th, td {
-            text-align: left;
-            padding: 1rem;
-            border-bottom: 1px solid #333;
-        }
-        th { background: #1a1a24; }
-        .actions { display: flex; gap: 0.5rem; }
-        .hidden { display: none !important; }
-        .banned-words { margin-top: 2rem; background: #1a1a24; padding: 1rem; border-radius: 8px; }
-        .badge { padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.8rem; }
-        .badge.pending { background: #b8860b; }
-        .badge.approved { background: #006400; }
-        .badge.rejected { background: #8b0000; }
-        .badge.featured { background: #4b0082; }
-    </style>
+        .action-approve { background: rgba(0, 200, 0, 0.2); color: #8f8; border: 1px solid rgba(0,200,0,0.4); }
+        .action-reject { background: rgba(200, 0, 0, 0.2); color: #f88; border: 1px solid rgba(200,0,0,0.4); }
+        .action-feature { background: rgba(100, 0, 255, 0.2); color: #b8f; border: 1px solid rgba(100,0,255,0.4); }
+        .action-delete { background: rgba(255, 0, 0, 0.4); color: #fff; border: 1px solid rgba(255,0,0,0.6); }
+        
+        .action-btn:hover { filter: brightness(1.5); box-shadow: 0 0 10px rgba(255,255,255,0.2); }
     </style>
 </head>
-<body>
+<body class="theme-late-night">
 
-    <div id="login-screen" class="login-box">
-        <h2>Admin Access</h2>
-        <input type="password" id="admin-pass" placeholder="Enter password (hint: 2am)">
-        <button onclick="login()">Enter</button>
-        <div id="login-error" style="color: red; margin-top: 1rem;"></div>
+    <div class="background-animation"></div>
+
+    <div id="login-screen" class="container" style="max-width: 500px; margin-top: 10vh;">
+        <div class="glass-card" style="text-align: center;">
+            <h2 class="step-title">Admin Access</h2>
+            <input type="password" id="admin-pass" class="glass-input" placeholder="Enter password (hint: 2am)" style="width: 100%; margin-bottom: 1.5rem; text-align: center;">
+            <button class="submit-button" onclick="login()" style="margin-top: 0;">Enter Dashboard</button>
+            <div id="login-error" class="error-text"></div>
+        </div>
     </div>
 
-    <div id="dashboard" class="container hidden">
-        <h1>Admin Dashboard</h1>
-        
-        <div style="margin-bottom: 2rem;">
-            <button onclick="logout()">Logout</button>
-            <a href="index.html" style="color: #a0a0a0; margin-left: 1rem;">Back to site</a>
+    <div id="dashboard" class="container hidden" style="max-width: 1000px;">
+        <div class="glass-card" style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 2rem;">
+            <h1 class="hero-title" style="margin-bottom: 0; font-size: 2.5rem; background: linear-gradient(180deg, #ffffff 0%, var(--theme-color) 150%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Dashboard</h1>
+            <div style="display: flex; align-items: center; gap: 1.5rem;">
+                <a href="index.html" class="share-btn" style="text-decoration: none;">Back to site</a>
+                <button class="action-btn action-reject" onclick="logout()">Logout</button>
+            </div>
         </div>
 
-        <div class="banned-words">
-            <h3>Banned Keywords</h3>
-            <div id="keywords-list" style="margin-bottom: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;"></div>
-            <input type="text" id="new-keyword" placeholder="Add new banned word" style="width: auto; display: inline-block;">
-            <button onclick="addKeyword()">Add</button>
+        <div class="glass-card" style="margin-bottom: 2rem;">
+            <h3 class="step-title" style="text-align: left; font-size: 1.2rem; margin-bottom: 1rem;">Banned Keywords</h3>
+            <div id="keywords-list" style="margin-bottom: 1.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;"></div>
+            <div style="display: flex; gap: 1rem;">
+                <input type="text" id="new-keyword" class="glass-input" placeholder="Add new banned word" style="padding: 0.6rem 1rem;">
+                <button class="action-btn action-approve" onclick="addKeyword()" style="padding: 0 1.5rem;">Add</button>
+            </div>
         </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Confession</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody id="admin-table-body">
-            </tbody>
-        </table>
+        <div class="glass-card" style="padding: 1.5rem 2rem;">
+            <h3 class="step-title" style="text-align: left; font-size: 1.2rem; margin-bottom: 1rem;">Confessions</h3>
+            <div style="overflow-x: auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Confession</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-table-body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 
     <script>
         let confessions = JSON.parse(localStorage.getItem('confessions')) || [];
         let bannedKeywords = JSON.parse(localStorage.getItem('bannedKeywords')) || ['spam', 'abuse', 'hate'];
+        let refreshInterval;
+
+        const passInput = document.getElementById('admin-pass');
+        passInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
 
         window.login = function() {
-            const pass = document.getElementById('admin-pass').value;
+            const pass = passInput.value;
             if (pass === '2am') {
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('dashboard').classList.remove('hidden');
-                renderAdmin();
-                renderKeywords();
+                initDashboard();
             } else {
                 document.getElementById('login-error').textContent = 'Incorrect password';
+                setTimeout(() => document.getElementById('login-error').textContent = '', 3000);
             }
         };
 
         window.logout = function() {
             document.getElementById('dashboard').classList.add('hidden');
             document.getElementById('login-screen').classList.remove('hidden');
-            document.getElementById('admin-pass').value = '';
+            passInput.value = '';
+            
+            clearInterval(refreshInterval);
+            window.removeEventListener('storage', syncData);
         };
+        
+        function initDashboard() {
+            loadData();
+            renderAdmin();
+            renderKeywords();
+            
+            // Auto Update Support
+            window.addEventListener('storage', syncData);
+            
+            // Refresh "time ago" every minute
+            refreshInterval = setInterval(renderAdmin, 60000);
+        }
+        
+        function syncData(e) {
+            if (e.key === 'confessions' || e.key === 'bannedKeywords') {
+                loadData();
+                renderAdmin();
+                renderKeywords();
+            }
+        }
+        
+        function loadData() {
+            confessions = JSON.parse(localStorage.getItem('confessions')) || [];
+            bannedKeywords = JSON.parse(localStorage.getItem('bannedKeywords')) || ['spam', 'abuse', 'hate'];
+        }
 
         function renderAdmin() {
             const tbody = document.getElementById('admin-table-body');
-            tbody.innerHTML = confessions.map(c => `
+            if (confessions.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; color: var(--text-secondary); padding: 2rem;">No confessions yet.</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = confessions.map(c => {
+                const safeTimestamp = c.timestamp || new Date().toISOString();
+                const d = new Date(safeTimestamp);
+                const safeStatus = c.status || 'approved';
+                const safeText = c.text || '';
+                const timeAgoStr = Number.isNaN(d.getTime()) ? 'unknown' : (Math.floor((new Date() - d)/1000) < 60 ? 'now' : timeAgo(safeTimestamp));
+                const dateStr = Number.isNaN(d.getTime()) ? 'unknown' : d.toLocaleString();
+
+                return `
                 <tr>
-                    <td style="white-space: nowrap; font-size: 0.8rem;">${new Date(c.timestamp).toLocaleString()}</td>
-                    <td style="max-width: 400px; word-wrap: break-word; line-height: 1.4;">${escapeHTML(c.text)}</td>
+                    <td style="white-space: nowrap; font-size: 0.8rem; color: var(--text-secondary);">
+                        <div title="${dateStr}">${timeAgoStr}</div>
+                    </td>
+                    <td style="max-width: 400px; word-wrap: break-word; line-height: 1.4;">${escapeHTML(safeText)}</td>
                     <td>
-                        <span class="badge ${c.status}">${c.status}</span>
-                        ${c.featured ? '<br><span class="badge featured" style="margin-top:0.3rem;display:inline-block;">featured</span>' : ''}
+                        <div style="display: flex; flex-direction: column; gap: 0.3rem; align-items: flex-start;">
+                            <span class="badge ${safeStatus}">${safeStatus}</span>
+                            ${c.featured ? '<span class="badge featured">featured</span>' : ''}
+                        </div>
                     </td>
                     <td class="actions">
-                        ${c.status !== 'approved' ? `<button onclick="updateStatus('${c.id}', 'approved')">Approve</button>` : ''}
-                        ${c.status !== 'rejected' && c.status === 'approved' ? `<button onclick="updateStatus('${c.id}', 'rejected')" style="background:#500;">Reject</button>` : ''}
-                        ${c.status === 'approved' ? `<button onclick="toggleFeature('${c.id}')">${c.featured ? 'Unfeature' : 'Feature'}</button>` : ''}
-                        <button onclick="deleteConfession('${c.id}')" style="background:#800;">Delete</button>
+                        ${safeStatus !== 'approved' ? `<button class="action-btn action-approve" onclick="updateStatus('${c.id}', 'approved')">Approve</button>` : ''}
+                        ${safeStatus !== 'rejected' && safeStatus === 'approved' ? `<button class="action-btn action-reject" onclick="updateStatus('${c.id}', 'rejected')">Reject</button>` : ''}
+                        ${safeStatus === 'approved' ? `<button class="action-btn action-feature" onclick="toggleFeature('${c.id}')">${c.featured ? 'Unfeature' : 'Feature'}</button>` : ''}
+                        <button class="action-btn action-delete" onclick="deleteConfession('${c.id}')">Delete</button>
                     </td>
                 </tr>
-            `).join('');
+            `}).join('');
         }
 
         function renderKeywords() {
             const list = document.getElementById('keywords-list');
+            if (bannedKeywords.length === 0) {
+                list.innerHTML = '<span style="color: var(--text-secondary); font-size: 0.9rem;">No banned keywords.</span>';
+                return;
+            }
+            
             list.innerHTML = bannedKeywords.map(w => `
-                <span style="background:#333; padding:0.3rem 0.6rem; border-radius:15px; font-size:0.9rem; display:flex; align-items:center; gap:0.5rem;">
+                <span style="background:rgba(255,255,255,0.05); border: 1px solid var(--glass-border); padding:0.4rem 0.8rem; border-radius:15px; font-size:0.9rem; display:flex; align-items:center; gap:0.5rem; color: var(--text-primary);">
                     ${escapeHTML(w)}
-                    <button style="padding:0; background:none; color:#ff6b6b; border:none; cursor:pointer;" onclick="removeKeyword('${w.replace(/'/g, "\\'")}')">&times;</button>
+                    <button style="padding:0; background:none; color:#ff6b6b; border:none; cursor:pointer; font-size: 1.2rem; line-height: 1;" onclick="removeKeyword('${w.replace(/'/g, "\\'")}')">&times;</button>
                 </span>
             `).join('');
         }
@@ -165,6 +199,13 @@
                 document.getElementById('new-keyword').value = '';
             }
         };
+        
+        const keywordInput = document.getElementById('new-keyword');
+        keywordInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                addKeyword();
+            }
+        });
 
         window.removeKeyword = function(word) {
             bannedKeywords = bannedKeywords.filter(w => w !== word);
@@ -218,6 +259,23 @@
         function saveData() {
             localStorage.setItem('confessions', JSON.stringify(confessions));
             localStorage.setItem('bannedKeywords', JSON.stringify(bannedKeywords));
+            window.dispatchEvent(new StorageEvent('storage', {
+              key: 'confessions'
+            }));
+        }
+        
+        function timeAgo(dateString) {
+            const date = new Date(dateString);
+            const now = new Date();
+            const seconds = Math.floor((now - date) / 1000);
+
+            if (seconds < 60) return `${seconds} seconds ago`;
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `${minutes} minutes ago`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours} hours ago`;
+            const days = Math.floor(hours / 24);
+            return `${days} days ago`;
         }
     </script>
 </body>
