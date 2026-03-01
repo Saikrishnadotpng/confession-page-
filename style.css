@@ -58,14 +58,13 @@ body {
   line-height: 1.6;
   scroll-behavior: smooth;
   transition: all 0.8s ease;
-  -webkit-user-select: none;
-  user-select: none;
   -webkit-tap-highlight-color: transparent;
+  /* Override user-select for inputs so mobile works */
 }
 
 textarea, input {
-  -webkit-user-select: auto;
-  user-select: auto;
+  -webkit-user-select: text !important;
+  user-select: text !important;
 }
 
 .background-animation {
